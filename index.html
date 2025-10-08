@@ -772,7 +772,7 @@ button:active {
     let chatHistory = [
       {
         role: "system",
-        content: "Si presný a spoľahlivý AI asistent firmy DAC Consulting 2.0. DÔLEŽITÉ PRAVIDLÁ: 1) POUŽÍVAJ LEN INFORMÁCIE Z POSKYTNUTÉHO KONTEXTU - nevymýšľaj si fakty, ceny ani detaily. 2) Ak nie sú informácie v kontexte, poviedz 'Na túto otázku nemám presné informácie, kontaktujte nás prosím'. 3) Poskytuj presné informácie o colnej problematike, spotrebných daniach, CBAM a školeniach. 4) DAC Consulting 2.0 sa špecializuje na colné poradenstvo, spotrebné dane, CBAM mechanizmus a školenia. 5) Odpovedaj profesionálne, stručne a len na základe faktov z kontextu."
+        content: "Si presný a spoľahlivý AI asistent firmy DAC Consulting 2.0, špecializujúcej sa na colné poradenstvo, spotrebné dane, CBAM a školenia; odpovedaj stručne, profesionálne a prirodzene, používaj len informácie z poskytnutého kontextu; ak nemáš presné údaje, povedz: 'Na túto otázku nemám presné informácie, kontaktujte nás prosím'; poskytuj presné informácie o colnej problematike, spotrebných daniach, CBAM a školeniach; DAC Consulting 2.0 sa špecializuje na colné poradenstvo, spotrebné dane, CBAM mechanizmus a školenia; odpovedaj profesionálne, stručne a len na základe faktov z kontextu."
       }
     ];
 
@@ -1042,13 +1042,7 @@ async function sendMessage() {
       // Spracovanie **text** na <strong>text</strong>
       let formattedMessage = message.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       
-      // Automatické vytvorenie hyperlinkov z Calendly URL (ak nie sú už hyperlinky)
-      formattedMessage = formattedMessage.replace(
-        /https:\/\/calendly\.com\/aipoweragency\/new-meeting\?month=2025-08(?![^<]*>)/g,
-        '<a href="https://calendly.com/aipoweragency/new-meeting?month=2025-08" target="_blank">🔗 REZERVOVAŤ KONZULTÁCIU</a>'
-      );
-      
-      // Backup - ak sa niektore URL nezachytili
+      // Automatické vytvorenie hyperlinkov z URL
       formattedMessage = formattedMessage.replace(
         /(https?:\/\/[^\s<]+)(?![^<]*>)/g,
         '<a href="$1" target="_blank">$1</a>'
@@ -1077,11 +1071,11 @@ async function sendMessage() {
         const quickRepliesDiv = document.createElement('div');
         quickRepliesDiv.className = 'quick-replies';
         quickRepliesDiv.innerHTML = `
-          <button class="quick-reply-btn" onclick="handleQuickReply('Koľko to stojí?')">Ceny</button>
+          <button class="quick-reply-btn" onclick="handleQuickReply('Čo je CBAM?')">CBAM</button>
+          <button class="quick-reply-btn" onclick="handleQuickReply('Colné poradenstvo')">Colné poradenstvo</button>
+          <button class="quick-reply-btn" onclick="handleQuickReply('Spotrebné dane')">Spotrebné dane</button>
+          <button class="quick-reply-btn" onclick="handleQuickReply('Školenia')">Školenia</button>
           <button class="quick-reply-btn" onclick="handleQuickReply('Kontakt')">Kontakt</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Pracovné hodiny')">Otváracie hodiny</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Rezervácia stretnutia')">Stretnutie</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Kde sa nachádzate?')">Adresa</button>
         `;
         chatbox.appendChild(quickRepliesDiv);
       }

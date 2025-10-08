@@ -1,7 +1,7 @@
-# AI Power Chatbot s RAG systémom
+# DAC Consulting 2.0 Chatbot s RAG systémom
 
 ## Popis
-Inteligentný chatbot s implementovaným RAG (Retrieval-Augmented Generation) systémom pre lepšie odpovede založené na firemnej databáze znalostí.
+Inteligentný chatbot s implementovaným RAG (Retrieval-Augmented Generation) systémom pre lepšie odpovede založené na firemnej databáze znalostí o colnej problematike, spotrebných daniach, CBAM a školeniach.
 
 ## Implementované funkcie
 
@@ -14,20 +14,17 @@ Inteligentný chatbot s implementovaným RAG (Retrieval-Augmented Generation) sy
 ### 2. Optimalizovaná databáza znalostí
 Kompletne refaktorovaná štruktúra zameraná na RAG:
 
-**Knowledge Base kategórie (19 záznamov):**
-- `benefits` - Výhody AI chatbotov (štatistiky 24+h, 100+ leadov, 1k+ konverzií)
-- `process` - Proces implementácie (3-5 dní, demo, meeting, integrácia)
-- `pricing` - Cenové informácie (€69/mes ročne s 20% zľavou alebo €79/mes mesačne)
-- `technical` - Technické integrácie (jednoduchý script, 5 min integrácia)
-- `support` - Podpora a údržba
-- `customization` - Možnosti prispôsobenia
-- `booking` - Rezervácia konzultácií (30 min online, bezplatné)
-- `company` - Informácie o firme a poslanie
+**Knowledge Base kategórie:**
+- `services` - Služby DAC Consulting 2.0 (colné poradenstvo, spotrebné dane, CBAM)
+- `cbam` - Informácie o CBAM mechanizme
+- `customs` - Colné poradenstvo
+- `excise` - Spotrebné dane
+- `training` - Školenia a vzdelávanie
+- `process` - Proces spolupráce
 - `contact` - Kontaktné údaje
-- `services` - Prehľad služieb
-- `advantages` - Konkurenčné výhody (slovenský trh, kultúra)
-- `clients` - Cieľoví klienti
-- `portfolio` - Úspešné implementácie (60% menej hovorov)
+- `company` - Informácie o firme
+- `booking` - Rezervácia konzultácií
+- `advantages` - Konkurenčné výhody
 - `legal` - GDPR a ochrana údajov
 
 **Základné firemné údaje:**
@@ -87,14 +84,10 @@ vercel dev
 window.aiPowerData = {
   // Základné firemné informácie
   company: {
-    name: "AI Power",
+    name: "DAC Consulting 2.0",
     founded: 2025,
-    founder: "Marcel Lehocky",
-    location: "Bratislava, Slovensko",
-    website: "https://www.aipower.site",
-    email: "info@aipower.site", 
-    phone: "+421 904 603 171",
-    calendly: "https://calendly.com/..."
+    location: "Slovensko",
+    email: "info@dacconsulting.sk"
   },
   
   // Pracovné hodiny pre quick replies

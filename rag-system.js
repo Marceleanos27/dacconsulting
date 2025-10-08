@@ -5,9 +5,13 @@ class RAGSystem {
   constructor(knowledgeBase) {
     this.knowledgeBase = knowledgeBase;
     this.stopWords = new Set([
-      'a', 'je', 'to', 'na', 'v', 'sa', 'so', 'pre', 'ako', 'že', 'ma', 'mi', 'me', 'si', 'su', 'som',
-      'ale', 'ani', 'az', 'ak', 'bo', 'by', 'co', 'ci', 'do', 'ho', 'im', 'ju', 'ka', 'ku', 'ly',
-      'ne', 'ni', 'no', 'od', 'po', 'pri', 'ro', 'ta', 'te', 'ti', 'tu', 'ty', 'uz', 'vo', 'za'
+      'a', 'aby', 'aj', 'ak', 'ako', 'ale', 'alebo', 'ani', 'az', 'bo', 'bu', 'by', 'byt', 'ci',
+      'co', 'do', 'ho', 'i', 'ide', 'im', 'ist', 'ja', 'je', 'jeho', 'jej', 'ich', 'ju', 'k', 'kam',
+      'kde', 'kto', 'ku', 'lebo', 'len', 'ma', 'mat', 'me', 'mi', 'mna', 'mne', 'mnou', 'my', 'na',
+      'nas', 'nam', 'ne', 'nech', 'ni', 'no', 'o', 'od', 'ono', 'po', 'pod', 'pre', 'pred', 'pri',
+      'ro', 's', 'sa', 'si', 'so', 'som', 'su', 'ta', 'tak', 'takze', 'tato', 'te', 'teba', 'tebe',
+      'tebou', 'tento', 'ti', 'to', 'toto', 'tu', 'ty', 'tym', 'uz', 'v', 'vam', 'vas', 'vasa', 'vo',
+      'vsetko', 'za', 'ze'
     ]);
   }
 
@@ -17,7 +21,11 @@ class RAGSystem {
     const queryWords = this.extractKeywords(normalizedQuery);
     
     if (queryWords.length === 0) {
-      return [];
+      // Ak nie sú žiadne kľúčové slová, vráť základné informácie o firme
+      const fallback = this.knowledgeBase.filter(item => 
+        item.category === 'company' || item.category === 'contact'
+      ).slice(0, 2);
+      return fallback;
     }
 
     const results = this.knowledgeBase.map(item => {
@@ -28,7 +36,13 @@ class RAGSystem {
     .sort((a, b) => b.relevanceScore - a.relevanceScore)
     .slice(0, maxResults);
 
-    console.log('RAG Search Results:', results.map(r => ({ title: r.title, score: r.relevanceScore })));
+    console.log('RAG Search Results:', results.map(r => ({ 
+      id: r.id,
+      title: r.title, 
+      category: r.category,
+      score: r.relevanceScore 
+    })));
+    
     return results;
   }
 
@@ -43,28 +57,34 @@ class RAGSystem {
       if (item.keywords.some(keyword => 
         this.normalizeText(keyword).includes(word) || word.includes(this.normalizeText(keyword))
       )) {
-        score += 5;
+        score += 8; // Zvýšené skóre pre keywords
       }
       
       // Skóre pre výskyt v názve
       if (normalizedTitle.includes(word)) {
-        score += 4;
+        score += 6; // Zvýšené skóre pre title
       }
       
       // Skóre pre výskyt v obsahu
       if (normalizedContent.includes(word)) {
-        score += 2;
+        score += 3; // Mierne zvýšené skóre pre content
       }
       
       // Bonus za presný match celej frázy
       if (normalizedContent.includes(fullQuery) || normalizedTitle.includes(fullQuery)) {
-        score += 3;
+        score += 5; // Zvýšený bonus za presný match
       }
     });
 
     // Bonus za kategóriu matching
     if (this.getCategoryFromQuery(fullQuery) === item.category) {
-      score += 2;
+      score += 4; // Zvýšený bonus za kategóriu
+    }
+
+    // Bonus pre často používané kategórie
+    const priorityCategories = ['services', 'cbam', 'contact', 'training', 'company'];
+    if (priorityCategories.includes(item.category)) {
+      score += 1;
     }
 
     return score;
@@ -72,14 +92,28 @@ class RAGSystem {
 
   // Extrakcia kľúčových slov z dotazu
   extractKeywords(normalizedText) {
-    return normalizedText
+    // Prioritné kľúčové slová pre DAC Consulting
+    const priorityKeywords = [
+      'cbam', 'clo', 'colne', 'spotrebne', 'dane', 'skolenie', 'kurz',
+      'poradenstvo', 'zastupovanie', 'audit', 'kontrola', 'deklarant',
+      'aeo', 'incoterms', 'intrastat', 'emcs', 'alkohol', 'tabak',
+      'mineralny', 'olej', 'elektrina', 'plyn', 'uhlie', 'dovoz', 'vyvoz'
+    ];
+    
+    const words = normalizedText
       .split(/\s+/)
       .filter(word => 
         word.length > 2 && 
         !this.stopWords.has(word) &&
         !/^\d+$/.test(word)
-      )
-      .slice(0, 10); // Obmedzenie na 10 najdôležitejších slov
+      );
+    
+    // Rozdeliť na prioritné a ostatné slová
+    const priority = words.filter(word => priorityKeywords.includes(word));
+    const others = words.filter(word => !priorityKeywords.includes(word));
+    
+    // Prioritné slová idú ako prvé
+    return [...priority, ...others].slice(0, 12); // Zvýšený limit na 12 slov
   }
 
   // Normalizácia textu
@@ -95,14 +129,15 @@ class RAGSystem {
   // Detekcia kategórie z dotazu
   getCategoryFromQuery(query) {
     const categoryKeywords = {
-      'pricing': ['cena', 'kolko', 'stoji', 'price', 'balik', 'mesacne'],
-      'benefits': ['vyhody', 'preco', 'dovody', 'benefits', 'uzitocny'],
-      'process': ['proces', 'ako', 'postup', 'kroky', 'implementacia'],
-      'technical': ['integracia', 'technicke', 'crm', 'google sheets'],
-      'support': ['podpora', 'pomoc', 'udrzba', 'problem'],
-      'customization': ['na mieru', 'prisposobenie', 'vlastny', 'dizajn'],
-      'booking': ['rezervacia', 'stretnutie', 'konzultacia', 'calendly'],
-      'contact': ['adresa', 'lokacia', 'kde', 'kontakt', 'telefon', 'email', 'nachadza', 'sidli']
+      'company': ['spolocnost', 'firma', 'nas', 'historia', 'zalozena', 'preco', 'vyhody', 'experti'],
+      'contact': ['kontakt', 'adresa', 'telefon', 'email', 'kde', 'lokacia', 'nachadza', 'sidli', 'bratislava', 'ruzinov'],
+      'cbam': ['cbam', 'uhlikov', 'mechanizmus', 'kompenzacia', 'emisie', 'cement', 'hlinik', 'hnojiva', 'elektrina', 'ocel'],
+      'services': ['sluzby', 'ponukate', 'nabizite', 'co', 'robite', 'colne', 'poradenstvo', 'zastupovanie', 'audit', 'pomoc'],
+      'training': ['skolenie', 'kurz', 'vzdelavanie', 'seminar', 'trening', 'workshop', 'konzultacny'],
+      'payment': ['platba', 'cena', 'kolko', 'stoji', 'faktura', 'uhrada', 'bankovy', 'ucet', 'iban'],
+      'administrative': ['podmienky', 'storno', 'uzavierka', 'prihlaska', 'nahradnik', 'zlavy'],
+      'legal': ['gdpr', 'ochrana', 'udaje', 'osobne', 'sukromie'],
+      'news': ['aktuality', 'novinky', 'trump', 'cla', 'zmeny', 'legislativa']
     };
 
     for (const [category, keywords] of Object.entries(categoryKeywords)) {
@@ -116,24 +151,14 @@ class RAGSystem {
   // Vytvorenie kontextu pre AI model
   buildContext(relevantContent) {
     if (relevantContent.length === 0) {
-      return '';
+      return `PRESNÉ INFORMÁCIE O DAC CONSULTING 2.0: Spoločnosť založená v roku 2007, špecializujúca sa na colné poradenstvo, spotrebné dane a CBAM. Kontakt: info@dacconsulting.sk, +421 907 760 347.`;
     }
     
     const context = relevantContent
-      .map(item => `**${item.title}:**\n${item.content}`)
-      .join('\n\n');
+      .map((item, index) => `[${index + 1}] **${item.title}:**\n${item.content}`)
+      .join('\n\n---\n\n');
     
-    // Kontrola či je relevant booking/consultation kontext
-    const isBookingRelated = relevantContent.some(item => 
-      item.category === 'booking' || 
-      item.keywords.some(kw => ['rezervácia', 'stretnutie', 'konzultácia', 'calendly', 'meeting'].includes(kw.toLowerCase()))
-    );
-    
-    const bookingInstruction = isBookingRelated 
-      ? ' DÔLEŽITÉ: Calendly link formátuj ako klikateľný hyperlink: <a href="https://calendly.com/aipoweragency/new-meeting?month=2025-08" target="_blank">Rezervovať konzultáciu</a>.'
-      : '';
-    
-    return `PRESNÉ INFORMÁCIE O AI POWER (používaj LEN tieto fakty):\n\n${context}\n\nINŠTRUKCIE: Odpovedaj presne podľa týchto informácií. NEPRÍDÁVAJ žiadne vlastné detaily.${bookingInstruction} PRESNÉ CENY: ROČNÉ €69/mesiac (ušetríte 20%) alebo MESAČNÉ €79/mesiac - NIKDY iné sumy!`;
+    return `RELEVANTNÉ INFORMÁCIE O DAC CONSULTING 2.0 (používaj výhradne tieto fakty):\n\n${context}\n\n---\n\nINŠTRUKCIE PRE ODPOVEĎ:\n• Odpovedaj PRESNE podľa vyššie uvedených informácií\n• NEPRÍDÁVAJ vlastné fakty, detaily alebo odhady\n• Ak informácia nie je v kontexte, povedz: "Na túto otázku nemám presné informácie, kontaktujte nás prosím"\n• Uvádzaj konkrétne údaje (ceny, telefóny, adresy) len ak sú explicitne uvedené vyššie`;
   }
 
   // Získanie kontextu pre špecifickú kategóriu
