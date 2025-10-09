@@ -100,7 +100,8 @@
 
   // Počúva správy z iframe
   window.addEventListener("message", function(event) {
-    if (event.origin !== "https://dacconsulting.vercel.app/") return;
+    // Kontrola originu bez koncového lomítka
+    if (event.origin !== "https://dacconsulting.vercel.app") return;
     
     if (event.data.type === "chatbot-opened") {
       isOpen = true;
