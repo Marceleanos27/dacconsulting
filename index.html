@@ -444,14 +444,7 @@ button:active {
   background: rgba(23, 47, 150, 0.2);
 }
 
-/* Responzívne štýly pre Quick Reply buttony */
-@media (max-width: 480px) {
-  .quick-reply-btn {
-    font-size: 0.8em;
-    padding: 6px 12px;
-    min-height: 32px;
-  }
-}
+/* Responzívne štýly pre Quick Reply buttony - presunuté do hlavného @media (max-width: 480px) bloku */
 
 /* Kontaktný formulár */
 .contact-form {
@@ -551,17 +544,7 @@ button:active {
   transform: none;
 }
 
-/* Responzívne štýly pre formulár */
-@media (max-width: 480px) {
-  .contact-form {
-    padding: 12px;
-  }
-  
-  .form-group input,
-  .form-group textarea {
-    font-size: 16px; /* Zabráni zoomovaniu na iOS */
-  }
-}
+/* Responzívne štýly pre formulár - presunuté do hlavného @media (max-width: 480px) bloku */
 
 /* Responzívne štýly pre mobilné zariadenia */
 @media (max-width: 768px) {
@@ -582,22 +565,6 @@ button:active {
     right: 10px;
   }
   
-  /* V iframe režime */
-  body.iframe-mode #chatbot-container {
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: 0 !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-  }
-  
-  body.iframe-mode #chatbot-container.closed {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important;
-  }
-  
   #chatbot-header {
     padding: 8px 16px;
     font-size: 0.95em;
@@ -606,13 +573,6 @@ button:active {
   #chatbot-body {
     padding: 12px;
     height: calc(70vh - 80px);
-  }
-  
-  body.iframe-mode #chatbot-body {
-    height: 100%;
-    padding: 16px 16px 16px 16px;
-    box-sizing: border-box;
-    margin: 0;
   }
   
   #user-input {
@@ -642,22 +602,6 @@ button:active {
     right: 5px;
   }
   
-  /* V iframe režime */
-  body.iframe-mode #chatbot-container {
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    top: 0 !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-  }
-  
-  body.iframe-mode #chatbot-container.closed {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important;
-  }
-  
   #chatbot-header {
     padding: 6px 12px;
     font-size: 0.9em;
@@ -670,10 +614,6 @@ button:active {
   #chatbot-body {
     padding: 10px;
     height: calc(75vh - 75px);
-  }
-  
-  body.iframe-mode #chatbot-body {
-    height: 100%;
   }
   
   #user-input {
@@ -695,6 +635,23 @@ button:active {
   
   #toggle-icon {
     font-size: 1.3em;
+  }
+  
+  /* Quick Reply buttony */
+  .quick-reply-btn {
+    font-size: 0.8em;
+    padding: 6px 12px;
+    min-height: 32px;
+  }
+  
+  /* Kontaktný formulár */
+  .contact-form {
+    padding: 12px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    font-size: 16px; /* Zabráni zoomovaniu na iOS */
   }
 }
 
