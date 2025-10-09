@@ -112,9 +112,11 @@ body.iframe-mode #chatbot-container {
   right: 0;
   bottom: 0;
   width: 100% !important;
-  height: 600px !important;
+  height: 100% !important;
+  max-height: 100% !important;
   border-radius: 0 !important;
   border: none !important;
+  box-shadow: none !important;
 }
 
 #chatbot-container.closed {
@@ -202,6 +204,11 @@ body.iframe-mode #chatbot-container.closed {
   pointer-events: none;
 }
 
+/* V iframe režime - header má plný padding */
+body.iframe-mode #chatbot-header {
+  padding: 16px 20px !important;
+}
+
 #toggle-icon {
   font-size: 1.5em;
   transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1),
@@ -243,6 +250,13 @@ body.iframe-mode #chatbot-container.closed {
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
+}
+
+/* V iframe režime - chatbot body vyplní celú dostupnú výšku */
+body.iframe-mode #chatbot-body {
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 16px;
 }
 
 #chat-messages {
