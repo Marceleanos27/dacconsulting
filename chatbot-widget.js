@@ -3,7 +3,7 @@
   window.marcelChatbotLoaded = true;
 
   // Povolene domény
-  const allowed = ["dacconsulting.eu", "aipower.site", "localhost", "127.0.0.1:5500/TEST.html"];
+  const allowed = ["dacconsulting.eu", "aipower.site", "localhost", "127.0.0.1"];
   if (!allowed.includes(window.location.hostname)) {
     console.warn("Tento widget nie je povolený na tejto doméne");
     return; // NEvytvára iframe
