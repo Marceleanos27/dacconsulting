@@ -733,8 +733,8 @@ button:active {
       <!-- Kompletný režim (otvorený) -->
       <div class="user-info" style="display: flex; align-items: center; gap: 12px;">
         <div style="position: relative;">
-          <img src="dac.png" alt="DAC Consulting" style="height:40px; width:40px; border-radius:4px; object-fit:cover;">
-          <div style="position: absolute; bottom: 2px; right: 2px; width: 12px; height: 12px; background: #10b981; border-radius: 50%; border: 2px solid #C73C1A;"></div>
+          <img src="dac.png" alt="DAC Consulting" style="height:50px; width:50px; border-radius:6px; object-fit:cover;">
+          <div style="position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px; background: #10b981; border-radius: 50%; border: 2px solid #C73C1A;"></div>
         </div>
         <div>
           <div style="font-weight: 600; font-size: 16px; color: #ffffff; margin-bottom: 2px;">DAC Consulting</div>
@@ -747,7 +747,7 @@ button:active {
 
     <!-- Header pre zatvorený stav -->
     <div id="chatbot-header-closed" onclick="toggleChatbot()" style="display: none;">
-      <img src="dac.png" alt="DAC Consulting" style="height:40px; width:40px; border-radius:4px; object-fit:cover;">
+      <img src="dac.png" alt="DAC Consulting" style="height:50px; width:50px; border-radius:6px; object-fit:cover;">
     </div>
 
     <div id="chatbot-body">
@@ -757,6 +757,9 @@ button:active {
       <div id="input-area">
         <textarea id="user-input" placeholder="Napíšte správu..."></textarea>
         <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <div style="text-align: center; padding: 8px 0 0 0; font-size: 0.75em; color: rgba(0, 0, 0, 0.5);">
+        Made by <a href="https://aipower.site" target="_blank" style="color: #C73C1A; text-decoration: none; font-weight: 500;">AI Power</a>
       </div>
     </div>
   </div>
