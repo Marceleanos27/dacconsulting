@@ -3,14 +3,14 @@
   window.marcelChatbotLoaded = true;
 
   // Povolene domény
-  const allowed = ["aipower.site"];
+  const allowed = ["dacconsulting.eu", "aipower.site", "localhost", "http://127.0.0.1:5500/TEST.html"];
   if (!allowed.includes(window.location.hostname)) {
     console.warn("Tento widget nie je povolený na tejto doméne");
     return; // NEvytvára iframe
   }
 
   const iframe = document.createElement("iframe");
-  iframe.src = "https://ai-power2-0.vercel.app/"; // tvoje Vercel URL
+  iframe.src = "https://dacconsulting.vercel.app/"; // tvoje Vercel URL
   iframe.style.position = "fixed";
   iframe.style.bottom = "20px";
   iframe.style.right = "20px";
@@ -100,7 +100,7 @@
 
   // Počúva správy z iframe
   window.addEventListener("message", function(event) {
-    if (event.origin !== "https://ai-power2-0.vercel.app") return;
+    if (event.origin !== "https://dacconsulting.vercel.app/") return;
     
     if (event.data.type === "chatbot-opened") {
       isOpen = true;
