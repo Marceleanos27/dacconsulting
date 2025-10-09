@@ -201,10 +201,10 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
 }
 
 body.iframe-mode #chatbot-container.closed #chatbot-header-closed img {
-  width: 50% !important;
-  height: 50% !important;
-  max-width: 80px !important;
-  max-height: 80px !important;
+  width: 60% !important;
+  height: 60% !important;
+  max-width: 100px !important;
+  max-height: 100px !important;
 }
 
 #chatbot-header {
@@ -587,9 +587,9 @@ button:active {
 
 /* Responzívne štýly pre formulár - presunuté do hlavného @media (max-width: 480px) bloku */
 
-/* Responzívne štýly pre mobilné zariadenia - IBA pre standalone režim (nie iframe) */
+/* Responzívne štýly pre mobilné zariadenia */
 @media (max-width: 768px) {
-  body:not(.iframe-mode) #chatbot-container {
+  #chatbot-container {
     bottom: 10px;
     right: 10px;
     left: 10px;
@@ -599,36 +599,36 @@ button:active {
     max-height: 70vh;
   }
   
-  body:not(.iframe-mode) #chatbot-container.closed {
+  #chatbot-container.closed {
     width: 60px;
     height: 60px;
     left: auto;
     right: 10px;
   }
   
-  body:not(.iframe-mode) #chatbot-header {
+  #chatbot-header {
     padding: 8px 16px;
     font-size: 0.95em;
   }
   
-  body:not(.iframe-mode) #chatbot-body {
+  #chatbot-body {
     padding: 12px;
     height: calc(70vh - 80px);
   }
   
-  body:not(.iframe-mode) #user-input {
+  #user-input {
     height: 50px;
     font-size: 16px; /* Zabráni zoomovaniu na iOS */
   }
   
-  body:not(.iframe-mode) .message {
+  .message {
     max-width: 85%;
     font-size: 0.9em;
   }
 }
 
 @media (max-width: 480px) {
-  body:not(.iframe-mode) #chatbot-container {
+  #chatbot-container {
     bottom: 5px;
     right: 5px;
     left: 5px;
@@ -637,89 +637,89 @@ button:active {
     max-height: 75vh;
   }
   
-  body:not(.iframe-mode) #chatbot-container.closed {
+  #chatbot-container.closed {
     width: 60px;
     height: 60px;
     right: 5px;
   }
   
-  body:not(.iframe-mode) #chatbot-header {
+  #chatbot-header {
     padding: 6px 12px;
     font-size: 0.9em;
   }
   
-  body:not(.iframe-mode) #chatbot-header img {
+  #chatbot-header img {
     height: 32px !important;
   }
   
-  body:not(.iframe-mode) #chatbot-body {
+  #chatbot-body {
     padding: 10px;
     height: calc(75vh - 75px);
   }
   
-  body:not(.iframe-mode) #user-input {
+  #user-input {
     height: 45px;
     padding: 8px 10px;
     font-size: 16px;
   }
   
-  body:not(.iframe-mode) button {
+  button {
     padding: 10px;
     font-size: 0.9em;
   }
   
-  body:not(.iframe-mode) .message {
+  .message {
     padding: 8px 12px;
     max-width: 90%;
     font-size: 0.85em;
   }
   
-  body:not(.iframe-mode) #toggle-icon {
+  #toggle-icon {
     font-size: 1.3em;
   }
   
   /* Quick Reply buttony */
-  body:not(.iframe-mode) .quick-reply-btn {
+  .quick-reply-btn {
     font-size: 0.8em;
     padding: 6px 12px;
     min-height: 32px;
   }
   
   /* Kontaktný formulár */
-  body:not(.iframe-mode) .contact-form {
+  .contact-form {
     padding: 12px;
   }
   
-  body:not(.iframe-mode) .form-group input,
-  body:not(.iframe-mode) .form-group textarea {
+  .form-group input,
+  .form-group textarea {
     font-size: 16px; /* Zabráni zoomovaniu na iOS */
   }
 }
 
-/* Landscape orientácia na mobiloch - IBA pre standalone režim */
+/* Landscape orientácia na mobiloch */
 @media (max-width: 768px) and (orientation: landscape) {
-  body:not(.iframe-mode) #chatbot-container {
+  #chatbot-container {
     height: auto;
     max-height: 85vh;
   }
   
-  body:not(.iframe-mode) #chatbot-body {
+  #chatbot-body {
     height: calc(85vh - 80px);
   }
 }
 
-/* Veľmi malé zariadenia - IBA pre standalone režim */
+/* Veľmi malé zariadenia */
 @media (max-width: 320px) {
-  body:not(.iframe-mode) #chatbot-container.closed {
+  #chatbot-container.closed {
     width: 60px;
     height: 60px;
   }
   
-  body:not(.iframe-mode) #chatbot-header {
+  #chatbot-header {
     font-size: 0.85em;
   }
   
-  body:not(.iframe-mode) #chatbot-header img {
+  #chatbot-header img {
     height: 28px !important;
   }
 }
@@ -745,7 +745,7 @@ button:active {
 
     <!-- Header pre zatvorený stav -->
     <div id="chatbot-header-closed" onclick="toggleChatbot()" style="display: none;">
-      <img src="dac.png" alt="DAC Consulting" style="height:50px; width:50px; border-radius:6px; object-fit:cover;">
+      <img src="dac.png" alt="DAC Consulting" style="height:55px; width:55px; border-radius:6px; object-fit:cover;">
     </div>
 
     <div id="chatbot-body">
