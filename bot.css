@@ -87,7 +87,7 @@ body.iframe-mode #user-input {
 }
 
 body.iframe-mode .user-name {
-  font-size: 14px !important;
+  font-size: 16px !important;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -729,11 +729,11 @@ button:active {
   }
   
   body:not(.iframe-mode) .user-name {
-    font-size: 15px;
+    font-size: 16px;
   }
   
   body:not(.iframe-mode) .user-status {
-    font-size: 11px;
+    font-size: 12px;
   }
   
   body:not(.iframe-mode) #chatbot-body {
@@ -817,7 +817,7 @@ button:active {
   }
   
   body:not(.iframe-mode) .user-name {
-    font-size: 14px !important;
+    font-size: 16px !important;
   }
   
   body:not(.iframe-mode) .user-status {
