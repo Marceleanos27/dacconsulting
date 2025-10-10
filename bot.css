@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 /* CSS Reset pre iframe konzistenciu */
 * {
@@ -9,36 +9,31 @@
 }
 
 :root {
-  --gradient-primary: linear-gradient(135deg, #00D9FF 0%, #7C3AED 100%);
+  --primary-color: #172F96;
+  --secondary-color: #C73C1A;
+  --background-dark: #C73C1A;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --gradient-primary: #172F96;
 }
 
-/* Gradient hyperlink styles */
+/* Hyperlink styles */
 .message.bot a,
 .message a {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #172F96;
   text-decoration: none;
   font-weight: bold;
   position: relative;
   transition: all 0.3s ease;
 }
 
+
+
+/* Hover efekt pre odkazy */
 .message.bot a:hover,
 .message a:hover {
+  color: #C73C1A;
   text-decoration: underline;
-  transform: scale(1.02);
-}
-
-/* Fallback pre staršie prehliadače */
-@supports not (-webkit-background-clip: text) {
-  .message.bot a,
-  .message a {
-    color: #00D9FF;
-    background: none;
-    -webkit-text-fill-color: initial;
-  }
 }
 
 /* Základné nastavenie pre iframe kompatibilitu */
@@ -54,7 +49,7 @@ html {
 body {
   margin: 0 !important;
   padding: 0 !important;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -92,7 +87,8 @@ body.iframe-mode #user-input {
 }
 
 body.iframe-mode .user-name {
-  font-size: 16px !important;
+  font-size: 14px !important;
+  font-family: 'Poppins', sans-serif;
 }
 
 body.iframe-mode .user-status {
@@ -106,7 +102,7 @@ body.iframe-mode .user-status {
   width: 360px;
   height: 100%;
   max-height: 600px;
-  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+  background: #C73C1A;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   display: flex;
@@ -120,7 +116,7 @@ body.iframe-mode .user-status {
   z-index: 9999;
   box-sizing: border-box;
   border: none;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Keď je v iframe, vyplní celý priestor */
@@ -173,7 +169,7 @@ body.iframe-mode #chatbot-container.closed {
 
 #chatbot-container.closed #chatbot-header-closed {
   display: block !important;
-  background: rgba(26, 26, 46, 0.9);
+  background: #C73C1A;
   padding: 0;
   cursor: pointer;
   border: none;
@@ -205,7 +201,7 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
 }
 
 #chatbot-header-closed {
-  background: rgba(26, 26, 46, 0.8);
+  background: #C73C1A;
   color: white;
   padding: 0;
   cursor: pointer;
@@ -216,7 +212,7 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
 }
 
 #chatbot-header {
-  background: rgba(26, 26, 46, 0.8);
+  background: #C73C1A;
   color: white;
   padding: 16px 20px;
   cursor: pointer;
@@ -269,7 +265,7 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
   height: 12px;
   background: #10b981;
   border-radius: 50%;
-  border: 2px solid #1a1a2e;
+  border: 2px solid #C73C1A;
 }
 
 .user-details {
@@ -335,7 +331,7 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  background: #0f0f23;
+  background: #ffffff;
   flex: 1 1 auto;
   box-sizing: border-box;
   margin: 0;
@@ -388,22 +384,22 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
 
 .message.user {
   align-self: flex-end;
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  color: #ffffff;
+  background: rgba(23, 47, 150, 0.1);
+  color: #1a1a1a;
   position: relative;
   z-index: 100;
   border-radius: 18px 18px 4px 18px;
-  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.3);
+  border: 1px solid rgba(23, 47, 150, 0.2);
 }
 
 .message.bot {
   align-self: flex-start;
-  background: rgba(255, 255, 255, 0.08);
-  color: #e2e8f0;
+  background: rgba(199, 60, 26, 0.1);
+  color: #1a1a1a;
   position: relative;
   z-index: 100;
   border-radius: 18px 18px 18px 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(199, 60, 26, 0.2);
 }
 
 #input-area {
@@ -414,7 +410,7 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
   padding: 16px 0 0 0;
   flex-shrink: 0;
   position: relative;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(199, 60, 26, 0.2);
 }
 
 #user-input {
@@ -424,11 +420,11 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
   padding: 12px 16px;
   font-size: 14px !important;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-family: 'Montserrat', sans-serif;
+  border: 1px solid rgba(199, 60, 26, 0.3);
+  font-family: 'Poppins', sans-serif;
   box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(199, 60, 26, 0.05);
+  color: #1a1a1a;
   outline: none;
   transition: all 0.3s ease;
   scrollbar-width: none; /* Firefox */
@@ -441,17 +437,17 @@ body.iframe-mode #chatbot-container.closed #chatbot-header-closed {
 }
 
 #user-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(26, 26, 26, 0.5);
 }
 
 #user-input:focus {
-  border-color: #4f46e5;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  border-color: #172F96;
+  background: rgba(23, 47, 150, 0.1);
+  box-shadow: 0 0 0 3px rgba(23, 47, 150, 0.2);
 }
 
 button {
-  background: #4f46e5;
+  background: #172F96;
   color: white;
   border: none;
   border-radius: 50%;
@@ -461,7 +457,7 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
   height: 44px;
   width: 44px;
   display: flex;
@@ -470,14 +466,14 @@ button {
 }
 
 button:hover {
-  background: #3730a3;
+  background: #0f1f5e;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+  box-shadow: 0 4px 12px rgba(23, 47, 150, 0.4);
 }
 
 button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 2px 8px rgba(23, 47, 150, 0.3);
 }
 
 /* Quick Reply buttony */
@@ -491,15 +487,15 @@ button:active {
 
 .quick-reply-btn {
   background: transparent;
-  color: #00D9FF;
-  border: 1px solid #00D9FF;
+  color: #C73C1A;
+  border: 1px solid #C73C1A;
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 0.85em;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
   white-space: nowrap;
   flex-shrink: 0;
   height: auto;
@@ -511,28 +507,28 @@ button:active {
 }
 
 .quick-reply-btn:hover {
-  background: rgba(0, 217, 255, 0.1);
+  background: rgba(199, 60, 26, 0.1);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(199, 60, 26, 0.2);
 }
 
 .quick-reply-btn:active {
   transform: translateY(0);
-  background: rgba(0, 217, 255, 0.2);
+  background: rgba(199, 60, 26, 0.2);
 }
 
 /* Contact button - rovnaký štýl ako quick reply buttony */
 .contact-btn {
   background: transparent;
-  color: #00D9FF;
-  border: 1px solid #00D9FF;
+  color: #C73C1A;
+  border: 1px solid #C73C1A;
   border-radius: 20px;
   padding: 8px 16px;
   font-size: 0.85em;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
   white-space: nowrap;
   flex-shrink: 0;
   height: auto;
@@ -545,14 +541,14 @@ button:active {
 }
 
 .contact-btn:hover {
-  background: rgba(0, 217, 255, 0.1);
+  background: rgba(199, 60, 26, 0.1);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(199, 60, 26, 0.2);
 }
 
 .contact-btn:active {
   transform: translateY(0);
-  background: rgba(0, 217, 255, 0.2);
+  background: rgba(199, 60, 26, 0.2);
 }
 
 /* Responzívne štýly pre Quick Reply buttony - IBA pre NON-iframe */
@@ -588,7 +584,7 @@ button:active {
 .form-group label {
   display: block;
   margin-bottom: 4px;
-  color: #e2e8f0;
+  color: #1a1a1a;
   font-size: 0.8em;
   font-weight: 500;
 }
@@ -597,11 +593,11 @@ button:active {
 .form-group textarea {
   width: 100%;
   padding: 8px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(199, 60, 26, 0.3);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  font-family: 'Montserrat', sans-serif;
+  background: rgba(199, 60, 26, 0.05);
+  color: #1a1a1a;
+  font-family: 'Poppins', sans-serif;
   font-size: 0.85em;
   box-sizing: border-box;
   transition: all 0.3s ease;
@@ -611,14 +607,14 @@ button:active {
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #00D9FF;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 2px rgba(0, 217, 255, 0.2);
+  border-color: #C73C1A;
+  background: rgba(199, 60, 26, 0.1);
+  box-shadow: 0 0 0 2px rgba(199, 60, 26, 0.2);
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(26, 26, 26, 0.5);
 }
 
 .form-group textarea {
@@ -628,7 +624,7 @@ button:active {
 }
 
 .form-submit-btn {
-  background: linear-gradient(135deg, #00D9FF 0%, #7C3AED 100%);
+  background: #172F96;
   color: white;
   border: none;
   border-radius: 8px;
@@ -637,7 +633,7 @@ button:active {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Poppins', sans-serif;
   width: 100%;
   height: auto;
   min-height: 36px;
@@ -648,7 +644,7 @@ button:active {
 
 .form-submit-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(23, 47, 150, 0.3);
 }
 
 .form-submit-btn:active {

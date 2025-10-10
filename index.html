@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Ragnetiq</title>
+  <title>DAC Consulting</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="bot.css">
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -21,11 +21,11 @@
       <!-- Kompletný režim (otvorený) -->
       <div class="user-info">
         <div class="avatar-wrapper">
-          <img src="ragnetiq logo.png" alt="Ragnetiq Asistent">
+          <img src="dac.png" alt="DAC Consulting Asistent">
           <div class="status-indicator"></div>
         </div>
         <div class="user-details">
-          <div class="user-name">Ragnetiq Asistent</div>
+          <div class="user-name">DAC Consulting Asistent</div>
           <div class="user-status">Online</div>
         </div>
       </div>
@@ -35,7 +35,7 @@
 
     <!-- Header pre zatvorený stav -->
     <div id="chatbot-header-closed" onclick="toggleChatbot()" style="display: none;">
-      <img src="ragnetiq logo.png" alt="Ragnetiq Asistent" style="height:40px; width:40px; border-radius:50%; object-fit:cover;">
+      <img src="dac.png" alt="DAC Consulting Asistent" style="height:40px; width:40px; border-radius:50%; object-fit:cover;">
     </div>
 
     <div id="chatbot-body">
@@ -60,7 +60,7 @@
     let chatHistory = [
       {
         role: "system",
-        content: "Si presný a spoľahlivý AI asistent firmy Ragnetiq. DÔLEŽITÉ PRAVIDLÁ: 1) POUŽÍVAJ LEN INFORMÁCIE Z POSKYTNUTÉHO KONTEXTU - nevymýšľaj si fakty, ceny ani detaily. 2) Ak nie sú informácie v kontexte, poviedz 'Na túto otázku nemám presné informácie, kontaktujte nás prosím'. 3) PRESNÉ CENY: ROČNÉ predplatné €69/mesiac (€828 ročne, ušetríte 20%) alebo MESAČNÉ predplatné €79/mesiac - NIKDY neuvádzaj iné sumy! 4) PRESNÝ PROCES: 3-5 dní, nie týždne. 5) NEPRÍDÁVAJ detaily, ktoré nie sú v kontexte (ako 'ukážeme demo' ak to nie je spomenuté). 6) Firma Ragnetiq poskytuje LEN tvorbu AI chatbotov na mieru. 7) Odpovedaj profesionálne, stručne a len na základe faktov z kontextu."
+        content: "Si presný a spoľahlivý AI asistent firmy DAC Consulting 2.0, špecializujúcej sa na colné poradenstvo, spotrebné dane, CBAM a školenia; odpovedaj stručne, profesionálne a prirodzene, používaj len informácie z poskytnutého kontextu; ak nemáš presné údaje, povedz: 'Na túto otázku nemám presné informácie, kontaktujte nás prosím'; poskytuj presné informácie o colnej problematike, spotrebných daniach, CBAM a školeniach; DAC Consulting 2.0 sa špecializuje na colné poradenstvo, spotrebné dane, CBAM mechanizmus a školenia; odpovedaj profesionálne, stručne a len na základe faktov z kontextu."
       }
     ];
 
@@ -73,7 +73,7 @@
       }
       
       // Zobrazenie úvodnej správy
-      appendMessage("RAGNETIQ", "Dobrý deň! Ako vám môžem pomôcť? 👋", "bot", false, false, false);
+      appendMessage("DAC Consulting", "Dobrý deň! Ako vám môžem pomôcť? 👋", "bot", false, false, false);
       const quickRepliesDiv = document.createElement('div');
       quickRepliesDiv.className = 'quick-replies';
       quickRepliesDiv.innerHTML = `
