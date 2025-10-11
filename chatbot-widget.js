@@ -6,7 +6,7 @@
   const VERCEL_URL = "https://dacconsulting.vercel.app";
 
   // Povolene domény
-  const allowed = ["aipower.site", "localhost", "127.0.0.1"];
+  const allowed = ["dacconsulting.sk", "www.dacconsulting.sk", "localhost", "127.0.0.1"];
   if (!allowed.includes(window.location.hostname)) {
     console.warn("Tento widget nie je povolený na tejto doméne");
     return; // NEvytvára iframe

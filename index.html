@@ -60,7 +60,7 @@
     let chatHistory = [
       {
         role: "system",
-        content: "Si presný a spoľahlivý AI asistent firmy DAC Consulting 2.0, špecializujúcej sa na colné poradenstvo, spotrebné dane, CBAM a školenia; odpovedaj stručne, profesionálne a prirodzene, používaj len informácie z poskytnutého kontextu; ak nemáš presné údaje, povedz: 'Na túto otázku nemám presné informácie, kontaktujte nás prosím'; poskytuj presné informácie o colnej problematike, spotrebných daniach, CBAM a školeniach; DAC Consulting 2.0 sa špecializuje na colné poradenstvo, spotrebné dane, CBAM mechanizmus a školenia; odpovedaj profesionálne, stručne a len na základe faktov z kontextu."
+        content: "Si presný a spoľahlivý AI asistent firmy DAC Consulting 2.0, špecializujúcej sa na colné poradenstvo, spotrebné dane, CBAM a školenia. KRITICKÉ PRAVIDLÁ: 1) Používaj VÝLUČNE informácie z poskytnutého kontextu. 2) Môžeš uvádzať IBEN ceny školení, ak sú explicitne uvedené v kontexte (napr. '260 € bez DPH', '145 € bez DPH', '520 € bez DPH', 'individuálna dohoda'). 3) ZAKÁZANÉ je vymýšľať akékoľvek iné ceny, poplatky, sadzby alebo číselné údaje, ktoré NIE SÚ v kontexte. 4) Pri otázkach o cenách iných služieb (nie školení) VŽDY odpovedz: 'Pre informácie o cenách našich služieb nás prosím kontaktujte, radi vám pripravíme cenovú ponuku.' 5) NIKDY neuvádzaj konkrétne percentuálne úspory, mesačné poplatky alebo ročné ceny, ktoré NIE SÚ v kontexte. 6) Odpovedaj profesionálne, stručne a len na základe faktov z kontextu. DAC Consulting 2.0 sa špecializuje na colné poradenstvo, spotrebné dane, CBAM mechanizmus a školenia."
       }
     ];
 
@@ -179,7 +179,7 @@
             console.log('SUCCESS!', response.status, response.text);
             
             // Úspešná správa
-            appendMessage("RAGNETIQ", "🎉 **Ďakujeme!** Vaša správa bola úspešne odoslaná. Odpovieme vám čo najskôr.", "bot");
+            appendMessage("DAC Consulting", "🎉 **Ďakujeme!** Vaša správa bola úspešne odoslaná. Odpovieme vám čo najskôr.", "bot");
             
             // Skryť formulár po úspešnom odoslaní
             const formContainer = form.closest('.contact-form').parentElement;
@@ -191,7 +191,7 @@
             console.log('FAILED...', error);
             
             // Chybová správa
-            appendMessage("RAGNETIQ", "❌ **Ups!** Nastala chyba pri odosielaní správy. Skúste to prosím znovu alebo nás kontaktujte priamo na info@aipower.site", "bot");
+            appendMessage("DAC Consulting", "❌ **Ups!** Nastala chyba pri odosielaní správy. Skúste to prosím znovu alebo nás kontaktujte priamo na office@dacconsulting.sk", "bot");
             
             // Obnoviť tlačidlo
             submitBtn.disabled = false;
@@ -464,7 +464,7 @@ async function sendMessage() {
     .replace(/[\u0300-\u036f]/g, ''); // odstráni diakritiku
 
   // Vždy používaj RAG systém pre odpovede
-  appendMessage("RAGNETIQ", "Hľadám relevantné informácie...", "bot", true);
+  appendMessage("DAC Consulting", "Hľadám relevantné informácie...", "bot", true);
 
   try {
     await delay(800);
@@ -516,12 +516,12 @@ async function sendMessage() {
     const isContactRelated = reply.includes("kontakt") || 
                             reply.includes("telefón") || 
                             reply.includes("email") ||
-                            reply.includes("info@aipower.site") ||
+                            reply.includes("office@dacconsulting.sk") ||
                             reply.includes("+421") ||
                             sources.some(source => source.toLowerCase().includes("kontakt"));
 
     removeLastBotMessage();
-    appendMessage("RAGNETIQ", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
+    appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
     chatHistory.push({ role: "assistant", content: reply });
 
   } catch (error) {
@@ -530,9 +530,9 @@ async function sendMessage() {
     
     // Fallback pre lokálne testovanie
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      appendMessage("RAGNETIQ", "Na túto otázku neviem dostatočne odpovedať.", "bot", false, false, true);
+      appendMessage("DAC Consulting", "Na túto otázku neviem dostatočne odpovedať.", "bot", false, false, true);
     } else {
-      appendMessage("RAGNETIQ", `Ups, nastala chyba: ${error.message}`, "bot");
+      appendMessage("DAC Consulting", `Ups, nastala chyba: ${error.message}`, "bot");
     }
   }
 }
@@ -550,13 +550,7 @@ async function sendMessage() {
       // Spracovanie **text** na <strong>text</strong>
       let formattedMessage = message.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
       
-      // Automatické vytvorenie hyperlinkov z Calendly URL (ak nie sú už hyperlinky)
-      formattedMessage = formattedMessage.replace(
-        /https:\/\/calendly\.com\/aipoweragency\/new-meeting\?month=2025-08(?![^<]*>)/g,
-        '<a href="https://calendly.com/aipoweragency/new-meeting?month=2025-08" target="_blank">🔗 REZERVOVAŤ KONZULTÁCIU</a>'
-      );
-      
-      // Backup - ak sa niektore URL nezachytili
+      // Automatické vytvorenie hyperlinkov z URL
       formattedMessage = formattedMessage.replace(
         /(https?:\/\/[^\s<]+)(?![^<]*>)/g,
         '<a href="$1" target="_blank">$1</a>'
@@ -580,19 +574,7 @@ async function sendMessage() {
         chatbox.appendChild(contactBtnDiv);
       }
       
-      // Pridaj Quick Reply buttony pod správu (nie do nej)
-      if (role === 'bot' && showQuickReplies) {
-        const quickRepliesDiv = document.createElement('div');
-        quickRepliesDiv.className = 'quick-replies';
-        quickRepliesDiv.innerHTML = `
-          <button class="quick-reply-btn" onclick="handleQuickReply('Koľko to stojí?')">Ceny</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Kontakt')">Kontakt</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Pracovné hodiny')">Otváracie hodiny</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Rezervácia stretnutia')">Stretnutie</button>
-          <button class="quick-reply-btn" onclick="handleQuickReply('Kde sa nachádzate?')">Adresa</button>
-        `;
-        chatbox.appendChild(quickRepliesDiv);
-      }
+      // Quick Reply buttony sú teraz implementované ako dynamické kategórie z databázy
 
       chatbox.scrollTop = chatbox.scrollHeight;
     }

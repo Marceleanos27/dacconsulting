@@ -12,16 +12,20 @@ class RAGSystem {
     
     // Synonymá pre lepšie vyhľadávanie
     this.synonyms = {
-      'cena': ['cenny', 'ceny', 'kolko', 'stoji', 'price', 'peniaze', 'platba', 'cost'],
+      'clo': ['colny', 'colne', 'colnictvo', 'dovozne', 'vyvozne', 'customs', 'duty'],
+      'dan': ['dane', 'danovy', 'spotrebna', 'excise', 'odvod', 'zdanenie'],
+      'cbam': ['uhlikov', 'carbon', 'emisie', 'uhlikova', 'hranicny', 'mechanizmus'],
+      'poradenstvo': ['konzultacia', 'konzultacie', 'poradca', 'poradenstvi', 'consulting', 'advisory'],
+      'audit': ['kontrola', 'overenie', 'revize', 'prehliadka', 'inspekcia'],
+      'zastupovanie': ['zastupca', 'representation', 'zahranicny', 'zahranicie', 'zastupenie'],
+      'dovoz': ['import', 'dovozca', 'dovezie', 'dovazat', 'dovozu'],
+      'vyvoz': ['export', 'vyvozca', 'vyvezie', 'vyvazat', 'vyvozu'],
+      'tarif': ['sadzba', 'tarifny', 'sadzobnik', 'klasifikacia', 'kod'],
+      'origin': ['povod', 'povodove', 'origin', 'eur1', 'preukaz'],
+      'skolenie': ['kurz', 'vzdelavanie', 'training', 'seminar', 'workshop'],
+      'legislativa': ['zakon', 'predpisy', 'legislativny', 'normy', 'pravidla'],
       'kontakt': ['spojenie', 'informacie', 'udaje', 'email', 'telefon', 'adresa'],
-      'pomoc': ['podpora', 'help', 'support', 'asistencia', 'pomoc'],
-      'chatbot': ['bot', 'asistent', 'ai', 'robot'],
-      'stretnutie': ['konzultacia', 'meeting', 'hovor', 'rozhovor', 'call'],
-      'rychly': ['okamzite', 'ihned', 'fast', 'quick', 'bezodkladne'],
-      'web': ['stranka', 'website', 'webova', 'online'],
-      'firma': ['spolocnost', 'company', 'business', 'podnik'],
-      'vytvoriť': ['urobit', 'navrhnout', 'postavit', 'implementovat', 'vytvorit'],
-      'zakaznik': ['klient', 'customer', 'uzivatel', 'navstevnik']
+      'cena': ['cenny', 'ceny', 'kolko', 'stoji', 'price', 'cenova', 'ponuka']
     };
   }
 
@@ -94,12 +98,7 @@ class RAGSystem {
       score += 8; // Zvýšené z 3 na 8
     }
 
-    // 4. Bonus za kategóriu matching
-    if (this.getCategoryFromQuery(fullQuery) === item.category) {
-      score += 3; // Zvýšené z 2 na 3
-    }
-
-    // 5. Bonus za čísla a ceny (€69, €79, 24/7, atď)
+    // 4. Bonus za čísla (ceny školení, telefónne čísla, dátumy)
     const numbers = fullQuery.match(/\d+/g);
     if (numbers) {
       numbers.forEach(num => {
@@ -116,12 +115,8 @@ class RAGSystem {
   extractKeywords(normalizedText) {
     return normalizedText
       .split(/\s+/)
-      .filter(word => 
-        word.length > 2 && 
-        !this.stopWords.has(word)
-        // Zachovať čísla (môžu byť dôležité pre ceny)
-      )
-      .slice(0, 15); // Zvýšené z 10 na 15
+      .filter(word => word.length > 2 && !this.stopWords.has(word))
+      .slice(0, 12);
   }
 
   // Extrakcia bigramov (2-slovné frázy)
@@ -159,25 +154,20 @@ class RAGSystem {
     return Array.from(expanded);
   }
 
-  // Kontrola podobnosti slov (fuzzy matching)
+  // Kontrola podobnosti slov (fuzzy matching pre preklepy)
   isSimilar(word1, word2) {
-    // Levenshtein distance pre jednoduché preklepy
     if (word1 === word2) return true;
     if (Math.abs(word1.length - word2.length) > 2) return false;
-    
-    // Skontroluj či jedno slovo obsahuje druhé
     if (word1.includes(word2) || word2.includes(word1)) return true;
     
-    // Jednoduchý Levenshtein (max 1-2 zmeny)
+    // Tolerancia max 1 preklep
     let changes = 0;
     const maxLen = Math.max(word1.length, word2.length);
-    
     for (let i = 0; i < maxLen; i++) {
       if (word1[i] !== word2[i]) changes++;
-      if (changes > 2) return false;
+      if (changes > 1) return false;
     }
-    
-    return changes <= 2;
+    return changes <= 1;
   }
 
   // Normalizácia textu
@@ -190,26 +180,7 @@ class RAGSystem {
       .trim();
   }
 
-  // Detekcia kategórie z dotazu
-  getCategoryFromQuery(query) {
-    const categoryKeywords = {
-      'pricing': ['cena', 'kolko', 'stoji', 'price', 'balik', 'mesacne'],
-      'benefits': ['vyhody', 'preco', 'dovody', 'benefits', 'uzitocny'],
-      'process': ['proces', 'ako', 'postup', 'kroky', 'implementacia'],
-      'technical': ['integracia', 'technicke', 'crm', 'google sheets'],
-      'support': ['podpora', 'pomoc', 'udrzba', 'problem'],
-      'customization': ['na mieru', 'prisposobenie', 'vlastny', 'dizajn'],
-      'booking': ['rezervacia', 'stretnutie', 'konzultacia', 'calendly'],
-      'contact': ['adresa', 'lokacia', 'kde', 'kontakt', 'telefon', 'email', 'nachadza', 'sidli']
-    };
 
-    for (const [category, keywords] of Object.entries(categoryKeywords)) {
-      if (keywords.some(keyword => query.includes(keyword))) {
-        return category;
-      }
-    }
-    return null;
-  }
 
   // Vytvorenie kontextu pre AI model
   buildContext(relevantContent) {
@@ -218,60 +189,24 @@ class RAGSystem {
     }
     
     const context = relevantContent
-      .map((item, index) => `**${index + 1}. ${item.title}** (relevancia: ${item.relevanceScore}):\n${item.content}`)
+      .map((item, index) => `**${index + 1}. ${item.title}**:\n${item.content}`)
       .join('\n\n');
     
-    // Kontrola či je relevant booking/consultation kontext
-    const isBookingRelated = relevantContent.some(item => 
-      item.category === 'booking' || 
-      item.keywords.some(kw => ['rezervácia', 'stretnutie', 'konzultácia', 'calendly', 'meeting'].includes(kw.toLowerCase()))
+    // Kontrola či obsahuje konzultačné kľúčové slová
+    const isConsultationRelated = relevantContent.some(item => 
+      item.keywords.some(kw => ['konzultácia', 'stretnutie', 'poradenstvo'].includes(kw.toLowerCase()))
     );
     
-    const bookingInstruction = isBookingRelated 
-      ? ' DÔLEŽITÉ: Calendly link formátuj ako klikateľný hyperlink: <a href="https://calendly.com/aipoweragency/new-meeting?month=2025-08" target="_blank">Rezervovať konzultáciu</a>.'
+    const consultationNote = isConsultationRelated 
+      ? ' Pri ponuke konzultácie odporuč kontaktovanie na telefón alebo email uvedený v kontexte.'
       : '';
     
-    return `PRESNÉ INFORMÁCIE O RAGNETIQ (používaj LEN tieto fakty):\n\n${context}\n\nINŠTRUKCIE: Odpovedaj presne podľa týchto informácií. NEPRÍDÁVAJ žiadne vlastné detaily.${bookingInstruction} PRESNÉ CENY: ROČNÉ €69/mesiac (ušetríte 20%) alebo MESAČNÉ €79/mesiac - NIKDY iné sumy!`;
-  }
-
-  // Získanie kontextu pre špecifickú kategóriu
-  getContextByCategory(category) {
-    const categoryItems = this.knowledgeBase.filter(item => item.category === category);
-    return this.buildContext(categoryItems);
+    return `PRESNÉ INFORMÁCIE O DAC CONSULTING 2.0 (používaj LEN tieto fakty):\n\n${context}\n\nINŠTRUKCIE: Odpovedaj presne podľa týchto informácií. NEPRÍDÁVAJ žiadne vlastné detaily.${consultationNote} Ceny školení uvedené v kontexte môžeš používať. Pre ceny iných služieb odporuč kontaktovanie firmy.`;
   }
 
   // Vyhľadávanie podľa ID
   getById(id) {
     return this.knowledgeBase.find(item => item.id === id);
-  }
-
-  // Získanie všetkých kategórií
-  getCategories() {
-    return [...new Set(this.knowledgeBase.map(item => item.category))];
-  }
-
-  // Debug metóda pre testovanie (vylepšená)
-  debugSearch(query) {
-    console.log('=== RAG DEBUG (Enhanced) ===');
-    console.log('Query:', query);
-    const normalized = this.normalizeText(query);
-    console.log('Normalized:', normalized);
-    const keywords = this.extractKeywords(normalized);
-    console.log('Keywords:', keywords);
-    console.log('Bigrams:', this.extractBigrams(normalized));
-    console.log('Expanded (with synonyms):', this.expandWithSynonyms(keywords));
-    console.log('Category:', this.getCategoryFromQuery(normalized));
-    
-    const results = this.searchRelevantContent(query, 5);
-    console.log('Results:', results.map(r => ({ 
-      title: r.title, 
-      score: r.relevanceScore,
-      category: r.category 
-    })));
-    console.log('Context:', this.buildContext(results.slice(0, 2)));
-    console.log('============================');
-    
-    return results;
   }
 }
 
