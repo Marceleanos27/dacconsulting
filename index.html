@@ -72,18 +72,9 @@
         console.log('RAG systém inicializovaný s', window.aiPowerData.knowledgeBase.length, 'záznamami');
       }
       
-      // Zobrazenie úvodnej správy
-      appendMessage("DAC Consulting", "Dobrý deň! Ako vám môžem pomôcť? 👋", "bot", false, false, false);
-      const quickRepliesDiv = document.createElement('div');
-      quickRepliesDiv.className = 'quick-replies';
-      quickRepliesDiv.innerHTML = `
-        <button class="quick-reply-btn" onclick="handleQuickReply('Koľko to stojí?')">Ceny</button>
-        <button class="quick-reply-btn" onclick="handleQuickReply('Kontakt')">Kontakt</button>
-        <button class="quick-reply-btn" onclick="handleQuickReply('Pracovné hodiny')">Otváracie hodiny</button>
-        <button class="quick-reply-btn" onclick="handleQuickReply('Rezervácia stretnutia')">Stretnutie</button>
-        <button class="quick-reply-btn" onclick="handleQuickReply('Kde sa nachádzate?')">Adresa</button>
-      `;
-      chatbox.appendChild(quickRepliesDiv);
+      // Zobrazenie úvodnej správy s dynamickými kategóriami
+      appendMessage("DAC Consulting", "Dobrý deň! Som asistent spoločnosti DAC Consulting 2.0. Môžete si vybrať z ponúkaných tlačidiel alebo napísať vlastnú otázku. 👋", "bot", false, false, false);
+      showCategoryButtons();
     });
 
     const chatbox = document.getElementById("chat-messages");
@@ -225,13 +216,234 @@
     }
 
     function handleQuickReply(question) {
-      // Nastav otázku do input fieldu a odošli ju
+      // Špeciálne spracovanie pre "Mám inú otázku"
+      if (question === "Mám inú otázku") {
+        appendMessage("Ty", question, "user");
+        appendMessage("DAC Consulting", "Samozrejme! Opýtajte sa ma na čokoľvek, čo vás zaujíma. Som tu, aby som vám pomohol. 😊", "bot");
+        return;
+      }
+      
+      // Pre ostatné quick replies - nastav otázku do input fieldu a odošli ju
       inputField.value = question;
       sendMessage();
     }
 
     function delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Funkcia na získanie unikátnych kategórií z databázy
+    function getUniqueCategories() {
+      if (!window.aiPowerData || !window.aiPowerData.knowledgeBase) return [];
+      const categories = window.aiPowerData.knowledgeBase.map(item => item.category);
+      return [...new Set(categories)]; // Unikátne kategórie
+    }
+
+    // Funkcia na získanie unikátnych podkategórií pre kategóriu "Služby"
+    function getUniqueSubcategories(category) {
+      if (!window.aiPowerData || !window.aiPowerData.knowledgeBase) return [];
+      const items = window.aiPowerData.knowledgeBase.filter(item => 
+        item.category === category && item.subcategory
+      );
+      const subcategories = items.map(item => item.subcategory);
+      return [...new Set(subcategories)]; // Unikátne podkategórie
+    }
+
+    // Funkcia na získanie položiek podľa kategórie
+    function getItemsByCategory(category) {
+      if (!window.aiPowerData || !window.aiPowerData.knowledgeBase) return [];
+      return window.aiPowerData.knowledgeBase.filter(item => item.category === category);
+    }
+
+    // Funkcia na získanie položiek podľa kategórie a podkategórie
+    function getItemsBySubcategory(category, subcategory) {
+      if (!window.aiPowerData || !window.aiPowerData.knowledgeBase) return [];
+      return window.aiPowerData.knowledgeBase.filter(item => 
+        item.category === category && item.subcategory === subcategory
+      );
+    }
+
+    // Funkcia na skrátenie textu
+    function truncateText(text, maxLength = 35) {
+      if (text.length <= maxLength) return text;
+      return text.substring(0, maxLength) + '...';
+    }
+
+    // Zobrazenie kategórií ako quick buttons
+    function showCategoryButtons() {
+      const categories = getUniqueCategories();
+      const quickRepliesDiv = document.createElement('div');
+      quickRepliesDiv.className = 'quick-replies';
+      
+      categories.forEach(category => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-reply-btn';
+        btn.textContent = category;
+        btn.onclick = () => handleCategoryClick(category);
+        quickRepliesDiv.appendChild(btn);
+      });
+      
+      chatbox.appendChild(quickRepliesDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    // Spracovanie kliknutia na kategóriu
+    function handleCategoryClick(category) {
+      // Pridaj správu užívateľa
+      appendMessage("Ty", category, "user");
+      
+      // Špeciálne spracovanie pre kategóriu "Služby" - zobraz podkategórie
+      if (category === "Služby") {
+        const subcategories = getUniqueSubcategories(category);
+        
+        if (subcategories.length === 0) {
+          appendMessage("DAC Consulting", "Prepáčte, v tejto kategórii momentálne nemám žiadne informácie.", "bot");
+          return;
+        }
+
+        // Bot odpoveď
+        const responseText = `Vyberte si oblasť služieb, ktorá vás zaujíma:`;
+        appendMessage("DAC Consulting", responseText, "bot");
+        
+        // Vytvor quick buttons s podkategóriami
+        const quickRepliesDiv = document.createElement('div');
+        quickRepliesDiv.className = 'quick-replies';
+        
+        subcategories.forEach(subcategory => {
+          const btn = document.createElement('button');
+          btn.className = 'quick-reply-btn';
+          btn.textContent = subcategory;
+          btn.onclick = () => handleSubcategoryClick(category, subcategory);
+          quickRepliesDiv.appendChild(btn);
+        });
+        
+        chatbox.appendChild(quickRepliesDiv);
+        chatbox.scrollTop = chatbox.scrollHeight;
+        return;
+      }
+      
+      // Pre ostatné kategórie - zobraz priamo témy
+      const items = getItemsByCategory(category);
+      
+      if (items.length === 0) {
+        appendMessage("DAC Consulting", "Prepáčte, v tejto kategórii momentálne nemám žiadne informácie.", "bot");
+        return;
+      }
+
+      //Bot odpoveď
+      const responseText = `Vyberte si konkrétnu tému z oblasti **${category}**:`;
+      appendMessage("DAC Consulting", responseText, "bot");
+      
+      // Vytvor quick buttons s title z danej kategórie
+      const quickRepliesDiv = document.createElement('div');
+      quickRepliesDiv.className = 'quick-replies';
+      
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-reply-btn';
+        btn.textContent = truncateText(item.title);
+        btn.title = item.title; // Celý text v tooltipe
+        btn.onclick = () => handleTopicClick(item);
+        quickRepliesDiv.appendChild(btn);
+      });
+      
+      chatbox.appendChild(quickRepliesDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    // Spracovanie kliknutia na podkategóriu (pre Služby)
+    function handleSubcategoryClick(category, subcategory) {
+      // Pridaj správu užívateľa
+      appendMessage("Ty", subcategory, "user");
+      
+      // Zobraz témy z danej podkategórie
+      const items = getItemsBySubcategory(category, subcategory);
+      
+      if (items.length === 0) {
+        appendMessage("DAC Consulting", "Prepáčte, v tejto oblasti momentálne nemám žiadne informácie.", "bot");
+        return;
+      }
+
+      // Bot odpoveď
+      const responseText = `Vyberte si konkrétnu tému z oblasti **${subcategory}**:`;
+      appendMessage("DAC Consulting", responseText, "bot");
+      
+      // Vytvor quick buttons s témami
+      const quickRepliesDiv = document.createElement('div');
+      quickRepliesDiv.className = 'quick-replies';
+      
+      items.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-reply-btn';
+        btn.textContent = truncateText(item.title);
+        btn.title = item.title; // Celý text v tooltipe
+        btn.onclick = () => handleTopicClick(item);
+        quickRepliesDiv.appendChild(btn);
+      });
+      
+      chatbox.appendChild(quickRepliesDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    // Spracovanie kliknutia na konkrétnu tému
+    async function handleTopicClick(item) {
+      // Pridaj správu užívateľa
+      appendMessage("Ty", item.title, "user");
+      
+      // Pridaj otázku do histórie
+      chatHistory.push({ role: "user", content: item.title });
+      
+      // Zobraz loading správu
+      appendMessage("DAC Consulting", "Pripravujem odpoveď...", "bot", true);
+      
+      try {
+        await delay(500);
+        
+        // Vytvor RAG kontext z tohto konkrétneho item
+        const ragContext = `Kontext:\nTitul: ${item.title}\nObsah: ${item.content}`;
+        const sources = [item.title];
+        
+        // API volanie s RAG kontextom
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ 
+            messages: chatHistory,
+            useRAG: true,
+            ragContext: ragContext,
+            sources: sources
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chyba ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        let reply = data.choices?.[0]?.message?.content?.trim() || "Prepáč, neviem na to odpovedať.";
+
+        // Odstráň loading správu
+        removeLastBotMessage();
+        
+        // Zobraz odpoveď od LLM
+        appendMessage("DAC Consulting", reply, "bot");
+        
+        // Pridaj odpoveď do histórie
+        chatHistory.push({ role: "assistant", content: reply });
+        
+      } catch (error) {
+        console.error("Chyba pri volaní API:", error);
+        removeLastBotMessage();
+        appendMessage("DAC Consulting", "Prepáčte, nastala chyba pri spracovaní vašej otázky. Skúste to prosím znova.", "bot");
+      }
+    }
+
+    // Späť na kategórie
+    function showBackToCategories() {
+      appendMessage("DAC Consulting", "Vyberte si oblasť, ktorá vás zaujíma:", "bot");
+      showCategoryButtons();
     }
 
    
