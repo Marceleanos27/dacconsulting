@@ -585,16 +585,17 @@ button:active {
 /* Kontaktný formulár */
 .contact-form {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #cccccc;
   border-radius: 12px;
   padding: 16px;
   margin: 12px 0;
   max-width: 100%;
+  box-shadow: 0 2px 8px rgba(199, 60, 26, 0.15);
 }
 
 .contact-form h4 {
   margin: 0 0 12px 0;
-  color: #00D9FF;
+  color: #172F96;
   font-size: 0.9em;
   font-weight: 600;
 }
