@@ -476,6 +476,28 @@ button:active {
   box-shadow: 0 2px 8px rgba(23, 47, 150, 0.3);
 }
 
+/* Chatbot Footer */
+#chatbot-footer {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: rgba(26, 26, 26, 0.6);
+  font-family: 'Poppins', sans-serif;
+  margin-top: 8px;
+}
+
+#chatbot-footer a {
+  color: #172F96;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#chatbot-footer a:hover {
+  color: #C73C1A;
+  text-decoration: none;
+}
+
 /* Quick Reply buttony */
 .quick-replies {
   display: flex;

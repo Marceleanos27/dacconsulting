@@ -46,6 +46,9 @@
         <textarea id="user-input" placeholder="Napíšte správu..."></textarea>
         <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
       </div>
+      <div id="chatbot-footer">
+        Made by <a href="https://ragnetiq.com/" target="_blank" rel="noopener noreferrer">Ragnetiq</a>
+      </div>
     </div>
   </div>
 
@@ -292,6 +295,12 @@
       // Pridaj správu užívateľa
       appendMessage("Ty", category, "user");
       
+      // Špeciálne spracovanie pre kategóriu "O spoločnosti" - priamo hľadaj v databáze
+      if (category === "O spoločnosti") {
+        searchInDatabase(category);
+        return;
+      }
+      
       // Špeciálne spracovanie pre kategóriu "Služby" - zobraz podkategórie
       if (category === "Služby") {
         const subcategories = getUniqueSubcategories(category);
@@ -446,7 +455,83 @@
       showCategoryButtons();
     }
 
-   
+    // Funkcia pre vyhľadávanie v databáze (pre kategórie ako "O spoločnosti")
+    async function searchInDatabase(query) {
+      chatHistory.push({ role: "user", content: query });
+
+      // Vždy používaj RAG systém pre odpovede
+      appendMessage("DAC Consulting", "Hľadám relevantné informácie...", "bot", true);
+
+      try {
+        await delay(800);
+
+        // RAG vyhľadávanie relevantného obsahu
+        let relevantContent = [];
+        let ragContext = '';
+        let sources = [];
+        let useRAG = false;
+
+        if (ragSystem) {
+          relevantContent = ragSystem.searchRelevantContent(query, 3);
+          if (relevantContent.length > 0) {
+            ragContext = ragSystem.buildContext(relevantContent);
+            sources = relevantContent.map(item => item.title);
+            useRAG = true;
+            console.log('Používam RAG s kontextom:', sources);
+          }
+        }
+
+        // API volanie s RAG kontextom
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ 
+            messages: chatHistory,
+            useRAG: useRAG,
+            ragContext: ragContext,
+            sources: sources
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Chyba ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        let reply = data.choices?.[0]?.message?.content?.trim() || "Prepáč, neviem na to odpovedať.";
+
+        // Kontrola či odpoveď obsahuje "nemám presné informácie" alebo podobné frázy
+        const isInsufficientAnswer = reply.includes("nemám presné informácie") || 
+                                    reply.includes("kontaktujte nás") ||
+                                    reply.includes("neviem na to odpovedať") ||
+                                    reply.includes("nemám dostatok informácií");
+
+        // Kontrola či odpoveď obsahuje kontaktné informácie
+        const isContactRelated = reply.includes("kontakt") || 
+                                reply.includes("telefón") || 
+                                reply.includes("email") ||
+                                reply.includes("office@dacconsulting.sk") ||
+                                reply.includes("+421") ||
+                                sources.some(source => source.toLowerCase().includes("kontakt"));
+
+        removeLastBotMessage();
+        appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
+        chatHistory.push({ role: "assistant", content: reply });
+
+      } catch (error) {
+        console.error("Chyba:", error);
+        removeLastBotMessage();
+        
+        // Fallback pre lokálne testovanie
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          appendMessage("DAC Consulting", "Na túto otázku neviem dostatočne odpovedať.", "bot", false, false, true);
+        } else {
+          appendMessage("DAC Consulting", `Ups, nastala chyba: ${error.message}`, "bot");
+        }
+      }
+    }
 
 async function sendMessage() {
   const message = inputField.value.trim();
