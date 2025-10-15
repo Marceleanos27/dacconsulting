@@ -301,6 +301,18 @@
         return;
       }
       
+      // Špeciálne spracovanie pre kategóriu "Kontakt" - priamo hľadaj v databáze
+      if (category === "Kontakt") {
+        searchInDatabase(category);
+        return;
+      }
+      
+      // Špeciálne spracovanie pre kategóriu "Cieľová skupina" - priamo hľadaj v databáze
+      if (category === "Cieľová skupina") {
+        searchInDatabase(category);
+        return;
+      }
+      
       // Špeciálne spracovanie pre kategóriu "Služby" - zobraz podkategórie
       if (category === "Služby") {
         const subcategories = getUniqueSubcategories(category);
