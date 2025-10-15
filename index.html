@@ -472,7 +472,7 @@
       chatHistory.push({ role: "user", content: query });
 
       // Vždy používaj RAG systém pre odpovede
-      appendMessage("DAC Consulting", "Hľadám relevantné informácie...", "bot", true);
+      appendMessage("DAC Consulting", '<div class="typing-indicator"><span></span><span></span><span></span></div>', "bot", true);
 
       try {
         await delay(800);
@@ -561,7 +561,7 @@ async function sendMessage() {
     .replace(/[\u0300-\u036f]/g, ''); // odstráni diakritiku
 
   // Vždy používaj RAG systém pre odpovede
-  appendMessage("DAC Consulting", "Hľadám relevantné informácie...", "bot", true);
+  appendMessage("DAC Consulting", '<div class="typing-indicator"><span></span><span></span><span></span></div>', "bot", true);
 
   try {
     await delay(800);
