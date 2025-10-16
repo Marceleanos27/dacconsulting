@@ -36,6 +36,40 @@
   text-decoration: underline;
 }
 
+/* Typing animation */
+@keyframes typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  background-color: #C73C1A;
+  border-radius: 50%;
+  display: inline-block;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
 /* Základné nastavenie pre iframe kompatibilitu */
 html {
   height: 100%;
@@ -476,6 +510,28 @@ button:active {
   box-shadow: 0 2px 8px rgba(23, 47, 150, 0.3);
 }
 
+/* Chatbot Footer */
+#chatbot-footer {
+  text-align: center;
+  padding: 6px 0;
+  font-size: 12px;
+  color: rgba(26, 26, 26, 0.6);
+  font-family: 'Poppins', sans-serif;
+  margin-top: 8px;
+}
+
+#chatbot-footer a {
+  color: #172F96;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+#chatbot-footer a:hover {
+  color: #C73C1A;
+  text-decoration: none;
+}
+
 /* Quick Reply buttony */
 .quick-replies {
   display: flex;
@@ -563,16 +619,17 @@ button:active {
 /* Kontaktný formulár */
 .contact-form {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #cccccc;
   border-radius: 12px;
   padding: 16px;
   margin: 12px 0;
   max-width: 100%;
+  box-shadow: 0 2px 8px rgba(199, 60, 26, 0.15);
 }
 
 .contact-form h4 {
   margin: 0 0 12px 0;
-  color: #00D9FF;
+  color: #172F96;
   font-size: 0.9em;
   font-weight: 600;
 }
