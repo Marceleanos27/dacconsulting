@@ -40,12 +40,20 @@ CREATE TABLE IF NOT EXISTS chat_logs (
   user_message TEXT NOT NULL,
   bot_response TEXT NOT NULL,
   website VARCHAR(255),
+  user_ip VARCHAR(45),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Add index for better query performance
+-- Add indexes for better query performance
 CREATE INDEX idx_chat_logs_created_at ON chat_logs(created_at DESC);
 CREATE INDEX idx_chat_logs_website ON chat_logs(website);
+CREATE INDEX idx_chat_logs_user_ip ON chat_logs(user_ip);
+```
+
+**If the table already exists**, just add the IP column:
+```sql
+ALTER TABLE chat_logs ADD COLUMN IF NOT EXISTS user_ip VARCHAR(45);
+CREATE INDEX IF NOT EXISTS idx_chat_logs_user_ip ON chat_logs(user_ip);
 ```
 
 ### Step 3: Set Environment Variables in Vercel
@@ -80,9 +88,12 @@ Or simply push to your git repository if you have automatic deployments enabled.
 {
   "userMessage": "What are your services?",
   "botResponse": "We offer customs consulting, excise duties...",
-  "website": "dacconsulting.sk"
+  "website": "dacconsulting.sk",
+  "userIP": "192.168.1.1"
 }
 ```
+
+**Note:** IP address is automatically extracted from request headers on the server side for privacy and security.
 
 ### Error Handling:
 - All API calls are non-blocking
@@ -103,6 +114,11 @@ SELECT * FROM chat_logs
 WHERE website = 'dacconsulting.sk' 
 ORDER BY created_at DESC;
 
+-- Get conversations from a specific IP address
+SELECT * FROM chat_logs 
+WHERE user_ip = '192.168.1.1' 
+ORDER BY created_at DESC;
+
 -- Get conversations from the last 24 hours
 SELECT * FROM chat_logs 
 WHERE created_at > NOW() - INTERVAL '24 hours' 
@@ -112,6 +128,12 @@ ORDER BY created_at DESC;
 SELECT website, COUNT(*) as total_conversations 
 FROM chat_logs 
 GROUP BY website 
+ORDER BY total_conversations DESC;
+
+-- Count conversations per IP address
+SELECT user_ip, COUNT(*) as total_conversations 
+FROM chat_logs 
+GROUP BY user_ip 
 ORDER BY total_conversations DESC;
 ```
 

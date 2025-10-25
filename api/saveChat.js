@@ -24,6 +24,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing required fields: userMessage and botResponse' });
     }
 
+    // Get user's IP address from request headers
+    const userIP = req.headers['x-forwarded-for']?.split(',')[0] || 
+                   req.headers['x-real-ip'] || 
+                   req.connection?.remoteAddress || 
+                   req.socket?.remoteAddress ||
+                   'unknown';
+
     // Initialize Supabase client
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -35,6 +42,7 @@ export default async function handler(req, res) {
           user_message: userMessage,
           bot_response: botResponse,
           website: website || null,
+          user_ip: userIP,
           created_at: new Date().toISOString()
         }
       ]);
