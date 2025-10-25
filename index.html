@@ -454,6 +454,9 @@
         // Pridaj odpoveď do histórie
         chatHistory.push({ role: "assistant", content: reply });
         
+        // Save conversation to API (non-blocking)
+        saveChatToAPI(item.title, reply);
+        
       } catch (error) {
         console.error("Chyba pri volaní API:", error);
         removeLastBotMessage();
@@ -531,6 +534,9 @@
         removeLastBotMessage();
         appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
         chatHistory.push({ role: "assistant", content: reply });
+
+        // Save conversation to API (non-blocking)
+        saveChatToAPI(query, reply);
 
       } catch (error) {
         console.error("Chyba:", error);
@@ -621,6 +627,9 @@ async function sendMessage() {
     appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
     chatHistory.push({ role: "assistant", content: reply });
 
+    // Save conversation to API (non-blocking)
+    saveChatToAPI(message, reply);
+
   } catch (error) {
     console.error("Chyba:", error);
     removeLastBotMessage();
@@ -679,6 +688,42 @@ async function sendMessage() {
     function removeLastBotMessage() {
       const tempMsg = chatbox.querySelector(".bot.temp");
       if (tempMsg) chatbox.removeChild(tempMsg);
+    }
+
+    /**
+     * Saves chat conversation to the backend API
+     * @param {string} userMessage - The user's message
+     * @param {string} botResponse - The bot's response
+     */
+    async function saveChatToAPI(userMessage, botResponse) {
+      try {
+        // Get the current website hostname
+        const website = window.location.hostname;
+        
+        // Call the saveChat API endpoint
+        const response = await fetch('/api/saveChat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userMessage: userMessage,
+            botResponse: botResponse,
+            website: website
+          })
+        });
+
+        // Check if the request was successful
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Failed to save chat:', errorData);
+        } else {
+          console.log('Chat saved successfully');
+        }
+      } catch (error) {
+        // Log errors silently to console - don't interrupt user experience
+        console.error('Error saving chat to API:', error);
+      }
     }
 
 
