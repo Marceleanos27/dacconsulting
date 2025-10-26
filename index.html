@@ -60,6 +60,52 @@
 <script src="rag-system.js"></script>
 
   <script>
+    // ========== SESSION MANAGEMENT ==========
+    let sessionId = null;
+    let messageIndex = 0;
+    let emailSubmittedInSession = false;
+    let ipAddress = null;
+    let geoLocationCity = null;
+
+    // Generuje UUID pre session
+    function getSessionId() {
+      if (!sessionId) {
+        sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0;
+          const v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
+      return sessionId;
+    }
+
+    // Nastaví flag že email bol odoslaný v tejto session
+    function markEmailSubmittedForSession() {
+      emailSubmittedInSession = true;
+    }
+
+    // Získanie IP adresy a geolokácie
+    async function fetchIPAndLocation() {
+      try {
+        // Získaj IP adresu
+        const ipResponse = await fetch('https://api.ipify.org?format=json');
+        const ipData = await ipResponse.json();
+        ipAddress = ipData.ip;
+
+        // Získaj geolokáciu
+        const geoResponse = await fetch(`https://ipapi.co/${ipAddress}/json/`);
+        const geoData = await geoResponse.json();
+        geoLocationCity = geoData.city || null;
+        
+        console.log('IP:', ipAddress, 'Mesto:', geoLocationCity);
+      } catch (error) {
+        console.error('Chyba pri získavaní IP/lokácie:', error);
+        ipAddress = null;
+        geoLocationCity = null;
+      }
+    }
+
+    // ========== CHAT HISTORY ==========
     let chatHistory = [
       {
         role: "system",
@@ -70,6 +116,12 @@
     // Inicializácia RAG systému po načítaní databázy
     let ragSystem = null;
     document.addEventListener('DOMContentLoaded', function() {
+      // Získaj session ID
+      getSessionId();
+      
+      // Získaj IP a geolokáciu
+      fetchIPAndLocation();
+      
       if (window.aiPowerData && window.RAGSystem) {
         ragSystem = new window.RAGSystem(window.aiPowerData.knowledgeBase);
         console.log('RAG systém inicializovaný s', window.aiPowerData.knowledgeBase.length, 'záznamami');
@@ -79,6 +131,47 @@
       appendMessage("DAC Consulting", "Dobrý deň! Som asistent spoločnosti DAC Consulting 2.0. Môžete si vybrať z ponúkaných tlačidiel alebo napísať vlastnú otázku. 👋", "bot", false, false, false);
       showCategoryButtons();
     });
+
+    // ========== KATEGORIZÁCIA SPRÁV ==========
+    function categorizeMessage(message) {
+      const lowercaseMsg = message.toLowerCase();
+      
+      // Kategória: ceny
+      if (lowercaseMsg.includes('cen') || lowercaseMsg.includes('balík') || 
+          lowercaseMsg.includes('koľko') || lowercaseMsg.includes('stojí') ||
+          lowercaseMsg.includes('price') || lowercaseMsg.includes('pricing')) {
+        return 'ceny';
+      }
+      
+      // Kategória: kontakt
+      if (lowercaseMsg.includes('kontakt') || lowercaseMsg.includes('stretnutie') || 
+          lowercaseMsg.includes('telefonujte') || lowercaseMsg.includes('zavolať') ||
+          lowercaseMsg.includes('contact') || lowercaseMsg.includes('meeting')) {
+        return 'kontakt';
+      }
+      
+      // Kategória: produkty
+      if (lowercaseMsg.includes('funkci') || lowercaseMsg.includes('chatbot') || 
+          lowercaseMsg.includes('feature') || lowercaseMsg.includes('možnosti')) {
+        return 'produkty';
+      }
+      
+      // Kategória: proces
+      if (lowercaseMsg.includes('proces') || lowercaseMsg.includes('implementáci') || 
+          lowercaseMsg.includes('kroky') || lowercaseMsg.includes('ako na to')) {
+        return 'proces';
+      }
+      
+      // Kategória: podpora
+      if (lowercaseMsg.includes('problém') || lowercaseMsg.includes('chyba') || 
+          lowercaseMsg.includes('nefunguje') || lowercaseMsg.includes('podpora') ||
+          lowercaseMsg.includes('help') || lowercaseMsg.includes('support')) {
+        return 'podpora';
+      }
+      
+      // Default: všeobecné
+      return 'všeobecné';
+    }
 
     const chatbox = document.getElementById("chat-messages");
     const inputField = document.getElementById("user-input");
@@ -181,8 +274,18 @@
           (response) => {
             console.log('SUCCESS!', response.status, response.text);
             
+            // Nastaviť flag pre session
+            markEmailSubmittedForSession();
+            
+            // Increment message index
+            messageIndex++;
+            
             // Úspešná správa
-            appendMessage("DAC Consulting", "🎉 **Ďakujeme!** Vaša správa bola úspešne odoslaná. Odpovieme vám čo najskôr.", "bot");
+            const botSuccessMessage = "🎉 **Ďakujeme!** Vaša správa bola úspešne odoslaná. Odpovieme vám čo najskôr.";
+            appendMessage("DAC Consulting", botSuccessMessage, "bot");
+            
+            // Uložiť email event do databázy
+            saveEmailEventToAPI(botSuccessMessage);
             
             // Skryť formulár po úspešnom odoslaní
             const formContainer = form.closest('.contact-form').parentElement;
@@ -414,8 +517,14 @@
       // Pridaj otázku do histórie
       chatHistory.push({ role: "user", content: item.title });
       
+      // Increment message index
+      messageIndex++;
+      
       // Zobraz loading správu
       appendMessage("DAC Consulting", "Pripravujem odpoveď...", "bot", true);
+      
+      // Začni merať čas odozvy
+      const startTime = Date.now();
       
       try {
         await delay(500);
@@ -423,6 +532,9 @@
         // Vytvor RAG kontext z tohto konkrétneho item
         const ragContext = `Kontext:\nTitul: ${item.title}\nObsah: ${item.content}`;
         const sources = [item.title];
+        
+        // Detekcia kategórie
+        const detectedCategory = item.category ? item.category.toLowerCase() : 'všeobecné';
         
         // API volanie s RAG kontextom
         const response = await fetch("/api/chat", {
@@ -445,6 +557,9 @@
         const data = await response.json();
         let reply = data.choices?.[0]?.message?.content?.trim() || "Prepáč, neviem na to odpovedať.";
 
+        // Vypočítaj čas odozvy
+        const timeToRespond = Date.now() - startTime;
+
         // Odstráň loading správu
         removeLastBotMessage();
         
@@ -454,8 +569,8 @@
         // Pridaj odpoveď do histórie
         chatHistory.push({ role: "assistant", content: reply });
         
-        // Save conversation to API (non-blocking)
-        saveChatToAPI(item.title, reply);
+        // Save conversation to API (non-blocking) with tracking
+        saveChatToAPI(item.title, reply, timeToRespond, detectedCategory);
         
       } catch (error) {
         console.error("Chyba pri volaní API:", error);
@@ -474,8 +589,14 @@
     async function searchInDatabase(query) {
       chatHistory.push({ role: "user", content: query });
 
+      // Increment message index
+      messageIndex++;
+
       // Vždy používaj RAG systém pre odpovede
       appendMessage("DAC Consulting", '<div class="typing-indicator"><span></span><span></span><span></span></div>', "bot", true);
+
+      // Začni merať čas odozvy
+      const startTime = Date.now();
 
       try {
         await delay(800);
@@ -485,6 +606,7 @@
         let ragContext = '';
         let sources = [];
         let useRAG = false;
+        let detectedCategory = 'všeobecné';
 
         if (ragSystem) {
           relevantContent = ragSystem.searchRelevantContent(query, 3);
@@ -493,7 +615,27 @@
             sources = relevantContent.map(item => item.title);
             useRAG = true;
             console.log('Používam RAG s kontextom:', sources);
+            
+            // Detekcia kategórie z RAG výsledkov
+            const topResult = relevantContent[0].title.toLowerCase();
+            
+            if (topResult.includes('cen') || topResult.includes('balík')) {
+              detectedCategory = 'ceny';
+            } else if (topResult.includes('kontakt') || topResult.includes('stretnutie')) {
+              detectedCategory = 'kontakt';
+            } else if (topResult.includes('produkt') || topResult.includes('služb')) {
+              detectedCategory = 'produkty';
+            } else if (topResult.includes('proces') || topResult.includes('implementáci')) {
+              detectedCategory = 'proces';
+            } else if (topResult.includes('podpora') || topResult.includes('problém')) {
+              detectedCategory = 'podpora';
+            }
           }
+        }
+
+        // Fallback na keyword analýzu ak RAG nenájde nič
+        if (!useRAG) {
+          detectedCategory = categorizeMessage(query);
         }
 
         // API volanie s RAG kontextom
@@ -517,6 +659,9 @@
         const data = await response.json();
         let reply = data.choices?.[0]?.message?.content?.trim() || "Prepáč, neviem na to odpovedať.";
 
+        // Vypočítaj čas odozvy
+        const timeToRespond = Date.now() - startTime;
+
         // Kontrola či odpoveď obsahuje "nemám presné informácie" alebo podobné frázy
         const isInsufficientAnswer = reply.includes("nemám presné informácie") || 
                                     reply.includes("kontaktujte nás") ||
@@ -535,8 +680,8 @@
         appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
         chatHistory.push({ role: "assistant", content: reply });
 
-        // Save conversation to API (non-blocking)
-        saveChatToAPI(query, reply);
+        // Save conversation to API (non-blocking) with tracking
+        saveChatToAPI(query, reply, timeToRespond, detectedCategory);
 
       } catch (error) {
         console.error("Chyba:", error);
@@ -560,6 +705,9 @@ async function sendMessage() {
 
   chatHistory.push({ role: "user", content: message });
 
+  // Increment message index
+  messageIndex++;
+
   // Normalizácia textu - odstránenie diakritiky a lowercase
   const normalizedMessage = message
     .toLowerCase()
@@ -569,6 +717,9 @@ async function sendMessage() {
   // Vždy používaj RAG systém pre odpovede
   appendMessage("DAC Consulting", '<div class="typing-indicator"><span></span><span></span><span></span></div>', "bot", true);
 
+  // Začni merať čas odozvy
+  const startTime = Date.now();
+
   try {
     await delay(800);
 
@@ -577,6 +728,7 @@ async function sendMessage() {
     let ragContext = '';
     let sources = [];
     let useRAG = false;
+    let detectedCategory = null;
 
     if (ragSystem) {
       relevantContent = ragSystem.searchRelevantContent(message, 3);
@@ -585,7 +737,29 @@ async function sendMessage() {
         sources = relevantContent.map(item => item.title);
         useRAG = true;
         console.log('Používam RAG s kontextom:', sources);
+        
+        // Detekcia kategórie z RAG výsledkov
+        const topResult = relevantContent[0].title.toLowerCase();
+        
+        if (topResult.includes('cen') || topResult.includes('balík')) {
+          detectedCategory = 'ceny';
+        } else if (topResult.includes('kontakt') || topResult.includes('stretnutie')) {
+          detectedCategory = 'kontakt';
+        } else if (topResult.includes('produkt') || topResult.includes('služb')) {
+          detectedCategory = 'produkty';
+        } else if (topResult.includes('proces') || topResult.includes('implementáci')) {
+          detectedCategory = 'proces';
+        } else if (topResult.includes('podpora') || topResult.includes('problém')) {
+          detectedCategory = 'podpora';
+        } else {
+          detectedCategory = 'všeobecné';
+        }
       }
+    }
+
+    // Fallback na keyword analýzu ak RAG nenájde nič
+    if (!useRAG) {
+      detectedCategory = categorizeMessage(message);
     }
 
     // API volanie s RAG kontextom
@@ -609,6 +783,9 @@ async function sendMessage() {
     const data = await response.json();
     let reply = data.choices?.[0]?.message?.content?.trim() || "Prepáč, neviem na to odpovedať.";
 
+    // Vypočítaj čas odozvy
+    const timeToRespond = Date.now() - startTime;
+
     // Kontrola či odpoveď obsahuje "nemám presné informácie" alebo podobné frázy
     const isInsufficientAnswer = reply.includes("nemám presné informácie") || 
                                 reply.includes("kontaktujte nás") ||
@@ -627,8 +804,8 @@ async function sendMessage() {
     appendMessage("DAC Consulting", reply, "bot", false, false, isInsufficientAnswer || isContactRelated);
     chatHistory.push({ role: "assistant", content: reply });
 
-    // Save conversation to API (non-blocking)
-    saveChatToAPI(message, reply);
+    // Save conversation to API (non-blocking) with all tracking info
+    saveChatToAPI(message, reply, timeToRespond, detectedCategory);
 
   } catch (error) {
     console.error("Chyba:", error);
@@ -694,8 +871,10 @@ async function sendMessage() {
      * Saves chat conversation to the backend API
      * @param {string} userMessage - The user's message
      * @param {string} botResponse - The bot's response
+     * @param {number} timeToRespond - Time in milliseconds to respond
+     * @param {string} category - Message category
      */
-    async function saveChatToAPI(userMessage, botResponse) {
+    async function saveChatToAPI(userMessage, botResponse, timeToRespond = null, category = null) {
       try {
         // Get the current website hostname
         const website = window.location.hostname;
@@ -709,7 +888,14 @@ async function sendMessage() {
           body: JSON.stringify({
             userMessage: userMessage,
             botResponse: botResponse,
-            website: website
+            website: website,
+            ipAddress: ipAddress,
+            sessionId: getSessionId(),
+            messageIndex: messageIndex,
+            timeToRespond: timeToRespond,
+            category: category,
+            geoLocationCity: geoLocationCity,
+            emailSubmitted: emailSubmittedInSession
           })
         });
 
@@ -723,6 +909,44 @@ async function sendMessage() {
       } catch (error) {
         // Log errors silently to console - don't interrupt user experience
         console.error('Error saving chat to API:', error);
+      }
+    }
+
+    /**
+     * Saves email event to the backend API
+     * @param {string} botSuccessMessage - The bot's success message after email sent
+     */
+    async function saveEmailEventToAPI(botSuccessMessage) {
+      try {
+        const website = window.location.hostname;
+        
+        const response = await fetch('/api/saveChat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            userMessage: 'Správa poslaná',
+            botResponse: botSuccessMessage,
+            website: website,
+            ipAddress: ipAddress,
+            sessionId: getSessionId(),
+            messageIndex: messageIndex,
+            timeToRespond: null,
+            category: 'Email',
+            geoLocationCity: geoLocationCity,
+            emailSubmitted: true
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Failed to save email event:', errorData);
+        } else {
+          console.log('Email event saved successfully');
+        }
+      } catch (error) {
+        console.error('Error saving email event to API:', error);
       }
     }
 

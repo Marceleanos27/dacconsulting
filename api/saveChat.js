@@ -17,35 +17,47 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { userMessage, botResponse, website } = req.body;
+    const { 
+      userMessage, 
+      botResponse, 
+      website, 
+      ipAddress,
+      sessionId, 
+      messageIndex, 
+      timeToRespond,
+      category, 
+      geoLocationCity, 
+      emailSubmitted 
+    } = req.body;
 
     // Validate required fields
-    if (!userMessage || !botResponse) {
-      return res.status(400).json({ error: 'Missing required fields: userMessage and botResponse' });
+    if (!userMessage || !website || !sessionId) {
+      return res.status(400).json({ error: 'Missing required fields: userMessage, website, and sessionId' });
     }
-
-    // Get user's IP address from request headers
-    const userIP = req.headers['x-forwarded-for']?.split(',')[0] || 
-                   req.headers['x-real-ip'] || 
-                   req.connection?.remoteAddress || 
-                   req.socket?.remoteAddress ||
-                   'unknown';
 
     // Initialize Supabase client
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // Prepare data for insertion
+    const chatData = {
+      user_message: userMessage,
+      bot_response: botResponse || null,
+      website: website,
+      user_ip: ipAddress || null,
+      session_id: sessionId,
+      message_index: messageIndex || null,
+      time_to_respond: timeToRespond || null,
+      category: category || null,
+      geo_location_city: geoLocationCity || null,
+      email_submitted: emailSubmitted || false,
+      created_at: new Date().toISOString()
+    };
+
     // Insert chat record into Supabase
     const { data, error } = await supabase
       .from('chat_logs')
-      .insert([
-        {
-          user_message: userMessage,
-          bot_response: botResponse,
-          website: website || null,
-          user_ip: userIP,
-          created_at: new Date().toISOString()
-        }
-      ]);
+      .insert([chatData])
+      .select();
 
     if (error) {
       console.error('Supabase error:', error);
@@ -53,7 +65,7 @@ export default async function handler(req, res) {
     }
 
     // Successfully saved
-    return res.status(200).json({ success: true, message: 'Chat saved successfully' });
+    return res.status(200).json({ success: true, message: 'Chat saved successfully', data });
 
   } catch (error) {
     console.error('Error saving chat:', error);
