@@ -616,20 +616,8 @@
             useRAG = true;
             console.log('Používam RAG s kontextom:', sources);
             
-            // Detekcia kategórie z RAG výsledkov
-            const topResult = relevantContent[0].title.toLowerCase();
-            
-            if (topResult.includes('cen') || topResult.includes('balík')) {
-              detectedCategory = 'ceny';
-            } else if (topResult.includes('kontakt') || topResult.includes('stretnutie')) {
-              detectedCategory = 'kontakt';
-            } else if (topResult.includes('produkt') || topResult.includes('služb')) {
-              detectedCategory = 'produkty';
-            } else if (topResult.includes('proces') || topResult.includes('implementáci')) {
-              detectedCategory = 'proces';
-            } else if (topResult.includes('podpora') || topResult.includes('problém')) {
-              detectedCategory = 'podpora';
-            }
+            // Použitie kategórie z RAG výsledku s najvyšším skóre
+            detectedCategory = relevantContent[0].category || 'všeobecné';
           }
         }
 
@@ -738,22 +726,8 @@ async function sendMessage() {
         useRAG = true;
         console.log('Používam RAG s kontextom:', sources);
         
-        // Detekcia kategórie z RAG výsledkov
-        const topResult = relevantContent[0].title.toLowerCase();
-        
-        if (topResult.includes('cen') || topResult.includes('balík')) {
-          detectedCategory = 'ceny';
-        } else if (topResult.includes('kontakt') || topResult.includes('stretnutie')) {
-          detectedCategory = 'kontakt';
-        } else if (topResult.includes('produkt') || topResult.includes('služb')) {
-          detectedCategory = 'produkty';
-        } else if (topResult.includes('proces') || topResult.includes('implementáci')) {
-          detectedCategory = 'proces';
-        } else if (topResult.includes('podpora') || topResult.includes('problém')) {
-          detectedCategory = 'podpora';
-        } else {
-          detectedCategory = 'všeobecné';
-        }
+        // Použitie kategórie z RAG výsledku s najvyšším skóre
+        detectedCategory = relevantContent[0].category || 'všeobecné';
       }
     }
 
