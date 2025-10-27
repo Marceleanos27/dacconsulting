@@ -53,11 +53,10 @@ export default async function handler(req, res) {
       created_at: new Date().toISOString()
     };
 
-    // Insert chat record into Supabase
-    const { data, error } = await supabase
+    // Insert chat record into Supabase (without select to avoid RLS SELECT policy requirement)
+    const { error } = await supabase
       .from('chat_logs')
-      .insert([chatData])
-      .select();
+      .insert([chatData]);
 
     if (error) {
       console.error('Supabase error:', error);
@@ -65,7 +64,7 @@ export default async function handler(req, res) {
     }
 
     // Successfully saved
-    return res.status(200).json({ success: true, message: 'Chat saved successfully', data });
+    return res.status(200).json({ success: true, message: 'Chat saved successfully' });
 
   } catch (error) {
     console.error('Error saving chat:', error);
